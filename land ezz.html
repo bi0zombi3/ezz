@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>خبير تحسين محركات البحث للمتاجر المحلية</title>
     <!-- Chosen Palette: Google Maps Inspired (Primary Blue: #4285F4, Secondary Green: #34A853, Dark Text: #3C4043, Light Background: #F8F9FA, Card Background: #FFFFFF) -->
-    <!-- Application Structure Plan: A single-page application segmented into full-viewport sections. Navigation is controlled by mouse wheel and touch swipe events, snapping to the next/previous section. This structure provides a focused, immersive, and presentation-like experience, allowing each service and key message to occupy the user's full attention before smoothly transitioning to the next. -->
+    <!-- Application Structure Plan: A single-page application segmented into full-viewport sections. Navigation is controlled by mouse wheel, touch swipe events, and explicit "Swipe Down" buttons at the bottom of each section (except the last). This structure provides a focused, immersive, and presentation-like experience, allowing each service and key message to occupy the user's full attention before smoothly transitioning to the next, with clear visual cues for progression. -->
     <!-- Visualization & Content Choices: 1. Hero: Inform -> Large typography & CTA -> Full screen for strong opening, with a typing effect for the main title and a relevant background video. 2. Services: Organize/Inform -> Interactive cards with Font Awesome icons that now have a more noticeable pulse animation -> Grid layout for larger screens, stacking for mobile, ensuring fit within 100vh. 3. Why Us: Inform -> Styled cards with Font Awesome icons that now have a more noticeable pulse animation -> Centered content for clear messaging. 4. Impact Chart: Compare -> Chart.js Bar Chart showing hypothetical growth animating on section entry, re-animating on re-entry, and much slower. 5. Review Chart: Inform -> Chart.js Donut Chart showing improved review mix animating on section entry, re-animating on re-entry, and much slower. Both charts centered within their full-screen section. 6. Contact: Inform/Action -> Clear contact details and call to action. CONFIRMING all visuals are HTML/CSS or Canvas. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -94,6 +94,28 @@
                 transform: scale(1);
             }
         }
+        .next-section-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(66, 133, 244, 0.7); /* Google Blue with transparency */
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between text and icon */
+        }
+        .next-section-btn:hover {
+            background-color: rgba(53, 122, 232, 0.9); /* Darker Google Blue on hover with transparency */
+            transform: translateX(-50%) translateY(-3px); /* Slight lift on hover */
+        }
     </style>
 </head>
 <body class="bg-[#F8F9FA] text-[#3C4043]">
@@ -111,6 +133,9 @@
                 </h1>
                 <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-gray-700">نحن نساعدك على تصدر نتائج البحث في خرائط جوجل، جذب المزيد من الزبائن، وبناء سمعة تجارية قوية عبر الإنترنت.</p>
                 <button id="discover-services-btn" class="bg-[#4285F4] text-white py-3 px-8 rounded-lg text-lg font-bold hover:bg-opacity-90 transition-all shadow-lg">اكتشف خدماتنا</button>
+                <button class="next-section-btn" data-section-index="1">
+                    اسحب للأسفل <i class="fas fa-chevron-down"></i>
+                </button>
             </section>
 
             <section id="services" class="section-container bg-white px-6">
@@ -148,6 +173,9 @@
                         <p class="text-gray-700 text-sm">نتعامل مع التقييمات السلبية بفعالية ونعمل على تحويلها لفرص تحسين تظهر اهتمامك بالعميل.</p>
                     </div>
                 </div>
+                <button class="next-section-btn" data-section-index="2">
+                    اسحب للأسفل <i class="fas fa-chevron-down"></i>
+                </button>
             </section>
             
             <section id="why-us" class="section-container bg-[#F8F9FA] px-6">
@@ -184,6 +212,9 @@
                         </div>
                     </div>
                 </div>
+                <button class="next-section-btn" data-section-index="3">
+                    اسحب للأسفل <i class="fas fa-chevron-down"></i>
+                </button>
             </section>
 
             <section id="impact" class="section-container bg-white px-6">
@@ -199,6 +230,9 @@
                         <canvas id="reviewChart"></canvas>
                     </div>
                 </div>
+                <button class="next-section-btn" data-section-index="4">
+                    اسحب للأسفل <i class="fas fa-chevron-down"></i>
+                </button>
             </section>
 
             <section id="contact" class="section-container bg-[#F8F9FA] px-6">
@@ -262,6 +296,16 @@
                     scrollToSection(1); // Scroll to the 'services' section (index 1)
                 });
             }
+
+            // Event listeners for "اسحب للأسفل" buttons
+            const nextButtons = document.querySelectorAll('.next-section-btn');
+            nextButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const targetIndex = parseInt(event.target.dataset.sectionIndex);
+                    scrollToSection(targetIndex);
+                });
+            });
+
 
             function handleWheel(event) {
                 event.preventDefault(); // Prevent default scroll behavior
@@ -444,9 +488,6 @@
                     },
                 }
             });
-
-            // Flag to control chart animation state
-            let chartsAreAnimated = false;
 
             // Intersection Observer for chart animation
             const chartObserver = new IntersectionObserver((entries) => {
